@@ -1,0 +1,20 @@
+SW: https://developers.google.com/web/fundamentals/primers/service-workers/?hl=pt-br
+
+Push notification with JAVA:
+https://github.com/web-push-libs/web-push
+
+É necessário ter uma chave de servidor no momento que registar o usuário seguindo o padrão: VAPID
+É possível gerar por este site: https://web-push-codelab.glitch.me/ ou usar o command-line: https://github.com/web-push-libs/web-push#command-line
+
+Curiosidades: O escopo do service worker será a origem completa. Em outras palavras, esse service worker receberá eventos fetch (busca de notificações) para tudo nesse domínio. Se registrarmos o arquivo do service worker em /example/sw.js, ele verá apenas os eventos fetch das páginas com URL iniciando com /example/ (ou seja, /example/page1/, /example/page2/).
+Sendo assim podemos registrar o SW somente para CP.
+
+Tecnologias: Push e Notification usam APIs diferentes, mas complementares: push é chamado quando um servidor fornece informações a um service worker; uma notificação é a ação de um trabalhador de serviço ou script de página da Web mostrando informações para um usuário.
+
+Cuidados: 
+- Só é possível registrar service workers em páginas disponibilizadas em HTTPS e HTTPS instalado no servidor.
+- Validar se solicitar notificações para CP bloquea futuramente pedir notificações por exemplo para Cartões, Seguros e etc...
+
+UX:
+Criar um layout que seja atrativo e que mostre o benefício dele aceitar ser notificado (ex: quando é enviada a proposta).
+Outro ponto é colocar uma sobreposição (fundo preto com alguma opacidade baixa) para dar enfoque ao modelo padrão de cada navegador com as opções de aceite de notificação.

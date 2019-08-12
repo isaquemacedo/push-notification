@@ -20,3 +20,34 @@
 /* eslint-env browser, serviceworker, es6 */
 
 'use strict';
+
+self.addEventListener('push', function (event) {
+    console.log('[Service Worker] Push Received.');
+    console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
+
+    const title = event.data.text();
+    const options = {
+        body: 'Yay it works.',
+        icon: 'images/icon.png',
+        badge: 'images/badge.png',
+        vibrate: [200, 100, 200, 100, 200, 100, 400],
+        tag: "request",
+        actions: [
+          { "action": "yes", "title": "Yes", "icon": "images/yes.png" },
+          { "action": "no", "title": "No", "icon": "images/no.png" }
+        ]
+    };
+
+    const notificationPromise = self.registration.showNotification(title, options);
+    event.waitUntil(notificationPromise);
+});
+
+self.addEventListener('notificationclick', function (event) {
+    console.log('[Service Worker] Notification click Received.');
+
+    event.notification.close();
+
+    event.waitUntil(
+        clients.openWindow('https://developers.google.com/web/')
+    );
+});
