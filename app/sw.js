@@ -1,42 +1,49 @@
-/*
-*
-*  Push Notifications codelab
-*  Copyright 2015 Google Inc. All rights reserved.
-*
-*  Licensed under the Apache License, Version 2.0 (the "License");
-*  you may not use this file except in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*      https://www.apache.org/licenses/LICENSE-2.0
-*
-*  Unless required by applicable law or agreed to in writing, software
-*  distributed under the License is distributed on an "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  See the License for the specific language governing permissions and
-*  limitations under the License
-*
-*/
-
-/* eslint-env browser, serviceworker, es6 */
-
 'use strict';
+
+const opt_approved = {
+    body: 'Temos novidades sobre o seu empréstimo!',
+    icon: 'images/bv-logo-sm.png',
+    badge: 'images/badge.png',
+    sound: 'mp3/accomplished.mp3'
+};
+
+const opt_dvv = {
+    body: 'Revise os documentos da sua proposta!',
+    icon: 'images/bv-logo-sm.png',
+    badge: 'images/badge.png',
+    sound: 'mp3/accomplished.mp3'
+}
+
+const opt_neg = {
+    body: 'Infelizmente sua proposta foi negada, acesse e saiba mais!',
+    icon: 'images/bv-logo-sm.png',
+    badge: 'images/badge.png',
+    sound: 'mp3/accomplished.mp3'
+}
+
+// self.addEventListener('activate', event => {
+//     clients.claim();
+// });
 
 self.addEventListener('push', function (event) {
     console.log('[Service Worker] Push Received.');
     console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
 
-    const title = event.data.text();
-    const options = {
-        body: 'Yay it works.',
-        icon: 'images/icon.png',
-        badge: 'images/badge.png',
-        vibrate: [200, 100, 200, 100, 200, 100, 400],
-        tag: "request",
-        actions: [
-          { "action": "yes", "title": "Yes", "icon": "images/yes.png" },
-          { "action": "no", "title": "No", "icon": "images/no.png" }
-        ]
-    };
+    let dt_status = JSON.parse(event.data.text().replace(/\'/g, '"'));
+    let title = '';
+    let options = {};
+
+    if (dt_status.status === "APR") {
+        title = "APROVADO";
+        options = opt_approved
+    }
+    else if (dt_status.status === "DVV") {
+        title = "Proposta devolvida!";
+        options = opt_dvv;
+    } else {
+        title = "Proposta negada!";
+        options = opt_neg
+    }
 
     const notificationPromise = self.registration.showNotification(title, options);
     event.waitUntil(notificationPromise);

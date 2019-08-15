@@ -1,0 +1,92 @@
+O que é o Push Notification ?
+É uma forma de contactar o usuário através de uma notificação, configurando em um site/aplicação web sem a necessidade de estar com o mesmo aberto em seu navegador e sem estar com o mesmo em execução, trazendo assim a sensação de notificação de um aplicativo.
+Outro ponto é que se o usuário estiver offline no momento de envio da notificação a mesma entrará em uma fila de entrega e o mesmo receberá quando se conectar a internet novamente (desde que não passe o tempo de expiração de cada navegador - ainda não existe um padrão para isso).
+
+Porém para começar a notificar o usuário é necessário solicitar sua permissão.
+E como faço isso ?
+
+Antes se solicitar precisamos seguir algumas etapas.
+Para o funcionamento do push notification precisamos trabalhar com algumas tecnologias: API's de Push e Notification, e, os servicers workers.
+
+A API de push é utilizada para enviar uma notificação.
+A API de notification é utilizado pelo service worker que recebe essa mensagem e toma uma ação, que no nosso caso será de exibir a notificação. 
+Service worker é um script que o navegador executa em segundo plano, permitindo assim realizar sicronizações em segundo plano e o envio de notificações push.
+
+A primeira etapa necessária é registar um service worker para nossa aplicação, ele já deve configurado conforme nossa necessidade e para isso precisamos de uma chave importante: VAPID.
+
+O que é VAPID ? É o conjunto de uma chave publica e privada para identificação voluntário de servidor de aplicativos que é passada para o serviço de push e usada para verificar se o aplicativo que assinou o usuário também é o aplicativo que enviará notificações. Utilizaremos ela em dois momentos:
+    1º Ao registrar o aceite do usuário;
+    2º Ao enviar a notificação;
+
+Feito isso e com a chave configurada em nosso SW (Service Worker) podemos registar o service worker, mas antes, precisamos verificar se o navegador suporta a utilização de services workers.
+Após isso ser validado registar nosso SW.
+
+Feito isso solicitamos ao usuário para aceitar as notificações, e, após o aceite enviamos nosso usuário para a API de PUSH. Ela nos retornar um PushSubscription, que contem um endpoint e a chave de criptografia necessários para o envio de dados, especificamente para o dispositivo utilizado.
+
+Mas como assim "dispositivo utilizado" ?
+As notificações não são enviadas a um usuário registrado em nossa base e sim a um dispositivo, ou seja, essa mensagem é enviada para o celular Moto G6 do Fulado de tal.
+
+Nesse ponto é necessário termos uma API que salvará esse endpoint associado a este usuário, para futuramente sabermos qual dispositivo(s) dele deve ser notificado.
+
+-----------------------------------------------------------------------------------------------
+
+Com nosso SW configurado, o PushSubscription armazenado e associado a um usuário basta começar a notificá-lo. E como fazer isso ?
+
+Temos uma biblioteca que auxilia nisso chamada web-push: https://github.com/web-push-libs/web-push
+Também temos uma implementação dela em java: https://github.com/web-push-libs/webpush-java
+
+Na notificação podemos enviar um data, que aceita texto, porém podemos mandar um json em uma string e em nosso SW tratamos. Usaremos isso para passar o status da notificação.
+
+Após o envio da mensagem nosso SW receberá essa notificação, identificará qual o status da notificação e assim podemos configurar algumas coisas como para cada status:
+- Icone
+- Mensagem
+- Link -  dessa forma podemos trackear esses clicks e ver a quantidade de acessos através das notificações para cada status
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Navegadores diferentes têm esquemas diferentes para lidar com isso, atualmente não há mecanismo padrão. O Firefox permite que um número limitado (cota) de mensagens push seja enviado para um aplicativo, embora as mensagens push que geram notificações estejam isentas desse limite. O limite é atualizado sempre que o site é visitado. Em comparação, o Chrome não se aplica a nenhum limite, mas exige que cada mensagem de envio faça com que uma notificação seja exibida.
+
+Observação : as versões do Chrome anteriores a 52 exigem que você configure um projeto no Google Cloud Messaging para enviar mensagens push e use o número do projeto e a chave de API associados ao enviar notificações por push. Também requer um manifesto de aplicativo, com alguns parâmetros especiais para usar este serviço.
